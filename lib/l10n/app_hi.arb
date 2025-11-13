@@ -1,0 +1,11 @@
+{
+  "@@locale": "hi",
+  "searchServices": "सेवाएं खोजें",
+  "hello": "नमस्ते, {userName}!",
+  "myProfile": "मेरी प्रोफ़ाइल",
+  "notifications": "सूचना",
+  "skip": "छोड़ें",
+  "selectLanguage": "भाषा चुने",
+  "english": "अंग्रेज़ी",
+  "hindi": "हिन्दी"
+}

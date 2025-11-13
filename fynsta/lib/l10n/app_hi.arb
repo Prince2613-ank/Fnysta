@@ -1,0 +1,19 @@
+{
+    "@@locale": "hi",
+    "searchServices": "सेवाएं खोजें",
+    "hello": "नमस्ते, {userName}!",
+    "myProfile": "मेरी प्रोफ़ाइल",
+    "notifications": "सूचना",
+    "skip": "छोड़ें",
+    "selectLanguage": "भाषा चुने",
+    "english": "अंग्रेज़ी",
+    "hindi": "हिन्दी",
+    "favorableDay": "नई शुरुआत के लिए शुभ दिन",
+    "specialForYou": "आपके लिए विशेष",
+    "multiPlatform": "Fnysta – भारत का पहला मल्टी-प्लेटफ़ॉर्म",
+    "navHome": "होम",
+    "navAstrology": "ज्योतिष",
+    "navCommunity": "समुदाय",
+    "navNews": "समाचार",
+    "navMore": "अधिक"
+}
