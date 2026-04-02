@@ -16,15 +16,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> sendOtp(String email) async {
-    // 🎯 MODIFIED: Updated the endpoint to the new send-otp2 URL.
     final uri = Uri.parse(ApiConstants.baseUrl + '/api/auth/send-otp2/');
-
-    if (kDebugMode) {
-      print('--- Sending OTP Request ---');
-      print('URL: $uri');
-      print('Body: ${json.encode({'email': email})}');
-      print('--------------------------');
-    }
 
     try {
       final response = await client.post(
@@ -32,13 +24,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email}),
       );
-
-      if (kDebugMode) {
-        print('--- Received OTP Response ---');
-        print('Status Code: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-        print('---------------------------');
-      }
 
       if (response.statusCode != 200) {
         final errorBody = json.decode(response.body);

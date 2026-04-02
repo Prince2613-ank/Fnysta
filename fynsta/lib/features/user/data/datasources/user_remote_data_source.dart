@@ -19,13 +19,6 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
     final uri = Uri.parse('${ApiConstants.baseUrl}/api/user/get-user/')
         .replace(queryParameters: {'email': email});
 
-    // ⭐ FIX: Added print statements for debugging the request
-    if (kDebugMode) {
-      print('--- Fetching User ---');
-      print('URL: $uri');
-      print('---------------------');
-    }
-
     try {
       final response = await client.get(
         uri,
