@@ -4,23 +4,30 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../../../../theme/dnd_toggle.dart';
 import '../../../../theme/theme_provider.dart';
-import '../../../user/data/datasources/user_remote_data_source.dart';
-import '../../../user/data/repositories/user_repository_impl.dart';
-import '../../../user/domain/usecases/get_user.dart';
-import '../../../user/presentation/bloc/user_bloc.dart';
-import '../../../home/presentation/pages/home_screen.dart';
+import '../../data/datasources/auth_remote_data_source.dart';
+import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/usecases/send_otp.dart';
+import '../../domain/usecases/verify_otp.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../bloc/auth_state.dart';
+import 'otp_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // We provide the UserBloc here
     return BlocProvider(
-      create: (context) => UserBloc(
-        getUser: GetUser(
-          UserRepositoryImpl(
-            remoteDataSource: UserRemoteDataSourceImpl(client: http.Client()),
+      create: (context) => AuthBloc(
+        sendOtp: SendOtp(
+          AuthRepositoryImpl(
+            remoteDataSource: AuthRemoteDataSourceImpl(client: http.Client()),
+          ),
+        ),
+        verifyOtp: VerifyOtp(
+          AuthRepositoryImpl(
+            remoteDataSource: AuthRemoteDataSourceImpl(client: http.Client()),
           ),
         ),
       ),
@@ -29,7 +36,7 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-// ⭐ FIX: Correctly defined _LoginScreenView as a StatefulWidget
+// _LoginScreenView is a StatefulWidget for the email login form
 class _LoginScreenView extends StatefulWidget {
   const _LoginScreenView();
 
@@ -44,6 +51,10 @@ class _LoginScreenViewState extends State<_LoginScreenView> {
   void dispose() {
     _emailController.dispose();
     super.dispose();
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
   }
 
   @override
@@ -62,17 +73,16 @@ class _LoginScreenViewState extends State<_LoginScreenView> {
           DndToggle(),
         ],
       ),
-      body: BlocListener<UserBloc, UserState>(
+      body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is UserLoaded) {
-            Navigator.pushAndRemoveUntil(
+          if (state is AuthCodeSentSuccess) {
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(user: state.user),
+                builder: (context) => OTPScreen(email: state.email),
               ),
-              (route) => false,
             );
-          } else if (state is UserError) {
+          } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                   content: Text(state.message), backgroundColor: Colors.red),
@@ -161,9 +171,9 @@ class _LoginScreenViewState extends State<_LoginScreenView> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                BlocBuilder<UserBloc, UserState>(
+                BlocBuilder<AuthBloc, AuthState>(
                   builder: (context, state) {
-                    if (state is UserLoading) {
+                    if (state is AuthLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
                     return SizedBox(
@@ -171,10 +181,17 @@ class _LoginScreenViewState extends State<_LoginScreenView> {
                       child: ElevatedButton(
                         onPressed: () {
                           final email = _emailController.text.trim();
-                          if (email.isNotEmpty) {
+                          if (_isValidEmail(email)) {
                             context
-                                .read<UserBloc>()
-                                .add(FetchUserEvent(email: email));
+                                .read<AuthBloc>()
+                                .add(SendOtpEvent(email: email));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please enter a valid email address'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
