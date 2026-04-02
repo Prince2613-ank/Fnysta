@@ -27,12 +27,6 @@ class HoroscopeRemoteDataSourceImpl implements HoroscopeRemoteDataSource {
       body: json.encode({'zodiac_sign': zodiacSign.toLowerCase()}),
     );
 
-    if (kDebugMode) {
-      print('API Endpoint: $endpoint');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-    }
-
     if (response.statusCode == 200) {
       return HoroscopeModel.fromJson(json.decode(response.body));
     } else {
